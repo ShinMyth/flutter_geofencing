@@ -20,7 +20,7 @@ class _SplashScreenViewState extends State<SplashScreenView> {
   void checkLocationPermission() async {
     await LocationService().checkLocationPermission();
 
-    // Navigate to home screen after 2.5 seconds
+    // Navigate to geofencing screen after 2.5 seconds
     Future.delayed(
       const Duration(milliseconds: 2500),
       () {

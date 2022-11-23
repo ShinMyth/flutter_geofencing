@@ -5,10 +5,18 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:maps_toolkit/maps_toolkit.dart' as maps_toolkit;
 
 late LatLng employeeLocation;
-late LatLng officeLocation;
 
 late BitmapDescriptor employeeLocationMarker;
-late BitmapDescriptor officeLocationMarker;
+
+const List<LatLng> officePolygonPoints = <LatLng>[
+  LatLng(8.494447689033173, 124.65176473964237),
+  LatLng(8.49468975564717, 124.65185459364372),
+  LatLng(8.494777297507396, 124.65161520650037),
+  LatLng(8.49471164111411, 124.65159173717258),
+  LatLng(8.494664554198868, 124.65171981264706),
+  LatLng(8.494488807209033, 124.65165611018516),
+  LatLng(8.494447689033173, 124.65176473964237),
+];
 
 Set<Marker> markers = {};
 
@@ -17,10 +25,6 @@ Set<Polygon> polygons = {};
 bool isWithinOfficePolygonPoints = false;
 
 class GeofencingService {
-  void setOfficeLocation({required LatLng officeLocationInput}) {
-    officeLocation = officeLocationInput;
-  }
-
   void setEmployeeLocation({
     required LatLng employeeLocationInput,
     required Function setState,
@@ -38,13 +42,6 @@ class GeofencingService {
           : 'assets/images/employee-marker-ios.png',
     );
 
-    officeLocationMarker = await BitmapDescriptor.fromAssetImage(
-      const ImageConfiguration(),
-      Platform.isAndroid
-          ? 'assets/images/office-marker-android.png'
-          : 'assets/images/office-marker-ios.png',
-    );
-
     generateMarkers(setState: setState);
   }
 
@@ -54,11 +51,6 @@ class GeofencingService {
         markerId: const MarkerId("employee"),
         icon: employeeLocationMarker,
         position: employeeLocation,
-      ),
-      Marker(
-        markerId: const MarkerId("office"),
-        icon: officeLocationMarker,
-        position: officeLocation,
       ),
     };
 
@@ -71,15 +63,7 @@ class GeofencingService {
     polygons = {
       Polygon(
         polygonId: const PolygonId('office'),
-        points: const <LatLng>[
-          LatLng(8.49448800611957, 124.65165587107256),
-          LatLng(8.494448214337387, 124.65176517108745),
-          LatLng(8.494688291360507, 124.6518543545352),
-          LatLng(8.49477583322106, 124.65161630849047),
-          LatLng(8.494709513631568, 124.6515921686099),
-          LatLng(8.494663753108133, 124.65172024408746),
-          LatLng(8.49448800611957, 124.65165587107256),
-        ],
+        points: officePolygonPoints,
         fillColor: isWithinOfficePolygonPoints
             ? Colors.green.withOpacity(0.275)
             : Colors.black.withOpacity(0.35),
@@ -101,15 +85,12 @@ class GeofencingService {
     );
 
     List<maps_toolkit.LatLng> officeLocationPolygonPoints =
-        <maps_toolkit.LatLng>[
-      maps_toolkit.LatLng(8.49448800611957, 124.65165587107256),
-      maps_toolkit.LatLng(8.494448214337387, 124.65176517108745),
-      maps_toolkit.LatLng(8.494688291360507, 124.6518543545352),
-      maps_toolkit.LatLng(8.49477583322106, 124.65161630849047),
-      maps_toolkit.LatLng(8.494709513631568, 124.6515921686099),
-      maps_toolkit.LatLng(8.494663753108133, 124.65172024408746),
-      maps_toolkit.LatLng(8.49448800611957, 124.65165587107256),
-    ];
+        <maps_toolkit.LatLng>[];
+
+    for (var element in officePolygonPoints) {
+      officeLocationPolygonPoints
+          .add(maps_toolkit.LatLng(element.latitude, element.longitude));
+    }
 
     isWithinOfficePolygonPoints = maps_toolkit.PolygonUtil.containsLocation(
       employeeLocationPoint,
