@@ -1,6 +1,4 @@
-import 'dart:developer';
 import 'package:geofencing/services/geofencing_service.dart';
-import 'package:geofencing/services/location_service.dart' as location_service;
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -18,23 +16,24 @@ class _GeofencingScreenViewState extends State<GeofencingScreenView> {
   @override
   void initState() {
     GeofencingService().setEmployeeLocation(
-      employeeLocationInput: location_service.employeeLocation,
-      setState: setState,
-    );
+        employeeLocationInput:
+            const LatLng(8.494248946505653, 124.65202668111144));
     super.initState();
   }
 
   void _onMapCreated(GoogleMapController controller) {
-    mapController = controller;
+    setState(() {
+      mapController = controller;
+    });
   }
 
-  void _onTap(LatLng eventLatLng) {
-    GeofencingService().setEmployeeLocation(
-      employeeLocationInput: eventLatLng,
-      setState: setState,
-    );
+  void _onMapTap(LatLng eventLatLng) {
+    setState(() {
+      GeofencingService()
+          .setEmployeeLocation(employeeLocationInput: eventLatLng);
 
-    animateCamera();
+      animateCamera();
+    });
   }
 
   void animateCamera() {
@@ -76,6 +75,7 @@ class _GeofencingScreenViewState extends State<GeofencingScreenView> {
                   zoom: 19,
                 ),
                 onMapCreated: _onMapCreated,
+                onTap: _onMapTap,
                 compassEnabled: false,
                 mapToolbarEnabled: false,
                 rotateGesturesEnabled: false,
@@ -84,28 +84,30 @@ class _GeofencingScreenViewState extends State<GeofencingScreenView> {
                 zoomGesturesEnabled: false,
                 tiltGesturesEnabled: false,
                 myLocationButtonEnabled: false,
-                markers: markers,
-                polygons: polygons,
-                onTap: _onTap,
+                markers: mapMarkers,
+                polygons: mapPolygons,
               ),
             ),
           ),
-          SizedBox(height: 4.h),
+          SizedBox(height: 5.h),
           Container(
             margin: EdgeInsets.symmetric(horizontal: 5.w),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ElevatedButton(
-                  onPressed:
-                      isWithinOfficePolygonPoints ? () => log("Clockin") : null,
-                  child: const Text("Clockin"),
+                Text(
+                  "Employee Latitude: ${employeeLocation.latitude}",
+                  style: TextStyle(fontSize: 16.sp),
                 ),
-                ElevatedButton(
-                  onPressed: isWithinOfficePolygonPoints
-                      ? () => log("Clockout")
-                      : null,
-                  child: const Text("Clockout"),
+                SizedBox(height: 1.h),
+                Text(
+                  "Employee Longitude: ${employeeLocation.longitude}",
+                  style: TextStyle(fontSize: 16.sp),
+                ),
+                SizedBox(height: 3.h),
+                Text(
+                  "Contain Location: $isContainsLocation",
+                  style: TextStyle(fontSize: 16.sp),
                 ),
               ],
             ),

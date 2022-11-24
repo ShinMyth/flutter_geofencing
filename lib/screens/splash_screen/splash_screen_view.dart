@@ -13,12 +13,12 @@ class SplashScreenView extends StatefulWidget {
 class _SplashScreenViewState extends State<SplashScreenView> {
   @override
   void initState() {
-    checkLocationPermission();
+    checkPermission();
     super.initState();
   }
 
-  void checkLocationPermission() async {
-    await LocationService().checkLocationPermission();
+  void checkPermission() async {
+    await LocationService().checkPermission();
 
     // Navigate to geofencing screen after 2.5 seconds
     Future.delayed(
